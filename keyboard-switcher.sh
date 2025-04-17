@@ -27,6 +27,21 @@ CONFIG_FILE="$CONFIG_DIR/${safe_id}.conf"
 # --- 現在のキーボードレイアウトを取得 ---
 current_layout=$(setxkbmap -query | grep layout | awk '{print $2}')
 
+# --- 自動モード: GUIなしで適用する ---
+if $AUTO_MODE; then
+    if [[ -f "$CONFIG_FILE" ]]; then
+        saved_layout=$(cat "$CONFIG_FILE")
+        if [[ "$saved_layout" == "us" || "$saved_layout" == "jp" ]]; then
+            setxkbmap "$saved_layout"
+            echo "[INFO] 自動実行: '${saved_layout}' を適用しました (${safe_id})"
+            exit 0
+        fi
+    fi
+    echo "[INFO] 自動実行: 設定が見つからなかったため変更なし"
+    exit 0
+fi
+
+# --- 手動実行: GUIで選択 ---
 us_selected=FALSE
 jp_selected=FALSE
 
@@ -34,23 +49,17 @@ if [[ -f "$CONFIG_FILE" ]]; then
     saved_layout=$(cat "$CONFIG_FILE")
     if [[ "$saved_layout" == "us" ]]; then
         us_selected=TRUE
-        jp_selected=FALSE
     elif [[ "$saved_layout" == "jp" ]]; then
-        us_selected=FALSE
         jp_selected=TRUE
     fi
 else
-    # 設定ファイルなし → 現在のキーボードレイアウトを使う
     if [[ "$current_layout" == "jp" ]]; then
-        us_selected=FALSE
         jp_selected=TRUE
     else
         us_selected=TRUE
-        jp_selected=FALSE
     fi
 fi
 
-# --- GUIで選択 ---
 layout=$(zenity --list \
     --title="キーボードレイアウトの選択" \
     --text="使用するキーボードレイアウトを選んでください\n(端末: ${hostname}, 解像度: ${resolution})" \
@@ -61,7 +70,7 @@ layout=$(zenity --list \
     FALSE "削除（設定をリセット）")
 
 # --- ユーザーが削除を選択した場合 ---
-if [[ $layout == "削除（設定をリセット）" ]]; then
+if [[ "$layout" == "削除（設定をリセット）" ]]; then
     zenity --question --title="設定削除" --text="自動実行設定とキーボード設定を削除しますか？"
     if [[ $? -eq 0 ]]; then
         rm -f "$AUTOSTART_FILE"
@@ -75,10 +84,10 @@ if [[ $layout == "削除（設定をリセット）" ]]; then
 fi
 
 # --- キーボードレイアウトの適用 ---
-if [[ $layout == "us (英語)" ]]; then
+if [[ "$layout" == "us (英語)" ]]; then
     setxkbmap us
     echo "us" > "$CONFIG_FILE"
-elif [[ $layout == "jp (日本語)" ]]; then
+elif [[ "$layout" == "jp (日本語)" ]]; then
     setxkbmap jp
     echo "jp" > "$CONFIG_FILE"
 else
