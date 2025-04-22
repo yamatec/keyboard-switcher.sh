@@ -96,10 +96,11 @@ else
 fi
 
 # --- 自動起動用のデスクトップエントリーを作成 ---
+# Exec行はスクリプト配置により適宜書き換え /usr/local/bin/ 推奨
 cat <<EOF > "$AUTOSTART_FILE"
 [Desktop Entry]
 Type=Application
-Exec=$HOME/path/to/keyboard-switcher.sh --auto
+Exec=$HOME/keyboard-switcher.sh --auto
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
