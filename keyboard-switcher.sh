@@ -34,6 +34,7 @@ if $AUTO_MODE; then
         if [[ "$saved_layout" == "us" || "$saved_layout" == "jp" ]]; then
             setxkbmap "$saved_layout"
             echo "[INFO] 自動実行: '${saved_layout}' を適用しました (${safe_id})"
+#            fcitx5 -d    # if fcitx5 not running ...
             exit 0
         fi
     fi
@@ -87,9 +88,11 @@ fi
 if [[ "$layout" == "us (英語)" ]]; then
     setxkbmap us
     echo "us" > "$CONFIG_FILE"
+#    fcitx5 -d    # if fcitx5 not running ...
 elif [[ "$layout" == "jp (日本語)" ]]; then
     setxkbmap jp
     echo "jp" > "$CONFIG_FILE"
+#    fcitx5 -d    # if fcitx5 not running ...
 else
     zenity --info --text="レイアウトが選択されませんでした。"
     exit 1
