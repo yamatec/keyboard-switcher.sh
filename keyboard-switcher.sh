@@ -64,7 +64,7 @@ else
     fi
 fi
 
-layout=$(zenity --list \
+layout=$(GSK_RENDERER=cairo zenity --list \
     --title="キーボードレイアウトの選択" \
     --text="使用するキーボードレイアウトを選んでください\n(端末: ${hostname}, 解像度: ${resolution})" \
     --radiolist \
@@ -75,11 +75,11 @@ layout=$(zenity --list \
 
 # --- ユーザーが削除を選択した場合 ---
 if [[ "$layout" == "削除（設定をリセット）" ]]; then
-    zenity --question --title="設定削除" --text="自動実行設定とキーボード設定を削除しますか？"
+    GSK_RENDERER=cairo zenity --question --title="設定削除" --text="自動実行設定とキーボード設定を削除しますか？"
     if [[ $? -eq 0 ]]; then
         rm -f "$AUTOSTART_FILE"
         rm -rf "$CONFIG_DIR"
-        zenity --info --text="削除が完了しました。"
+        GSK_RENDERER=cairo zenity --info --text="削除が完了しました。"
         echo "[INFO] 削除が完了しました。"
     else
         echo "[INFO] 削除をキャンセルしました。"
@@ -101,7 +101,7 @@ elif [[ "$layout" == "jp (日本語)" ]]; then
         fcitx5 -d
     fi
 else
-    zenity --info --text="レイアウトが選択されませんでした。"
+    GSK_RENDERER=cairo zenity --info --text="レイアウトが選択されませんでした。"
     exit 1
 fi
 
@@ -116,5 +116,5 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 EOF
 
-zenity --info --text="設定内容を保存し自動実行を設定しました (${AUTOSTART_FILE})"
+GSK_RENDERER=cairo zenity --info --text="設定内容を保存し自動実行を設定しました (${AUTOSTART_FILE})"
 echo "[INFO] 設定内容を保存し自動実行を設定しました (${AUTOSTART_FILE})"
