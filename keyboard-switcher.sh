@@ -11,6 +11,7 @@ fi
 CONFIG_DIR="$HOME/.config/keyboard_layouts"
 AUTOSTART_DIR="$HOME/.config/autostart"
 AUTOSTART_FILE="$AUTOSTART_DIR/keyboard-switcher.desktop"
+CURRENT_UID=$(id -u)
 
 mkdir -p "$CONFIG_DIR"
 mkdir -p "$AUTOSTART_DIR"
@@ -34,7 +35,9 @@ if $AUTO_MODE; then
         if [[ "$saved_layout" == "us" || "$saved_layout" == "jp" ]]; then
             setxkbmap "$saved_layout"
             echo "[INFO] 自動実行: '${saved_layout}' を適用しました (${safe_id})"
-#            fcitx5 -d    # if fcitx5 not running ...
+            if ! ps -u $CURRENT_UID -o comm | grep -q "^fcitx5$"; then
+                fcitx5 -d
+            fi
             exit 0
         fi
     fi
@@ -88,11 +91,15 @@ fi
 if [[ "$layout" == "us (英語)" ]]; then
     setxkbmap us
     echo "us" > "$CONFIG_FILE"
-#    fcitx5 -d    # if fcitx5 not running ...
+    if ! ps -u $CURRENT_UID -o comm | grep -q "^fcitx5$"; then
+        fcitx5 -d
+    fi
 elif [[ "$layout" == "jp (日本語)" ]]; then
     setxkbmap jp
     echo "jp" > "$CONFIG_FILE"
-#    fcitx5 -d    # if fcitx5 not running ...
+    if ! ps -u $CURRENT_UID -o comm | grep -q "^fcitx5$"; then
+        fcitx5 -d
+    fi
 else
     zenity --info --text="レイアウトが選択されませんでした。"
     exit 1
